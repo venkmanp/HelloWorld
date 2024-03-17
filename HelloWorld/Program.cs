@@ -1,4 +1,4 @@
-
+using Serilog;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace HelloWorld
@@ -7,6 +7,12 @@ namespace HelloWorld
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Warning()
+                .WriteTo.Console()
+                .WriteTo.File("logs/shoplog.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+            
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -28,6 +34,8 @@ namespace HelloWorld
             });
 
             builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
+
+            builder.Host.UseSerilog();
 
             var app = builder.Build();
 

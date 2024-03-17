@@ -8,12 +8,20 @@ namespace HelloWorld.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
+        private ILogger<ProductsController> _logger;
+        public ProductsController(ILogger<ProductsController> logger) 
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        
         [HttpGet]
         public ActionResult<List<ProductDTO>> GetProducts(int categoryID)
         {
             
             if (!CategoryExists(categoryID, out CategoryDTO category ))
             {
+                _logger.LogWarning($"Someone was looking for category with id: {categoryID}");
                 return NotFound();
             }
             
@@ -21,17 +29,19 @@ namespace HelloWorld.Controllers
         }
 
 
-        [HttpGet("{productID}")]
-        public ActionResult<ProductDTO> GetProduct(int CategoryID, int productID)
+        [HttpGet("{productID}", Name = "GetProduct")]
+        public ActionResult<ProductDTO> GetProduct(int categoryID, int productID)
         {
-            if (!CategoryExists(CategoryID, out CategoryDTO category))
+            if (!CategoryExists(categoryID, out CategoryDTO category))
             {
+                _logger.LogWarning($"Someone was looking for category with id: {categoryID}");
                 return NotFound();
             }
             ProductDTO product = category.Products.FirstOrDefault(p => p.ID == productID);
 
             if (product == null)
             {
+                _logger.LogWarning($"Someone was looking for product with id: {productID}");
                 return NotFound();
             }
             return Ok(product);
@@ -68,6 +78,48 @@ namespace HelloWorld.Controllers
                 categoryID,
                 productID = newProduct.ID
             }, newProduct);
+        }
+
+        [HttpPut("{productID}")]
+        public ActionResult UpdateProduct(int categoryID, int productID, ProductForUpdateDTO product)
+        {
+            if (!CategoryExists(categoryID, out CategoryDTO category))
+            {
+                return NotFound();
+            }
+
+            ProductDTO productFromStore = category.Products.FirstOrDefault(p=>p.ID == productID);
+
+            if (productFromStore == null) {
+                return NotFound();
+            }
+
+            productFromStore.Name = product.Name;
+            productFromStore.Description = product.Description;
+            productFromStore.Price = product.Price;
+
+            return NoContent();
+
+        }
+
+        [HttpDelete("{productID}")]
+        public ActionResult DeleteProduct (int categoryID, int productID)
+        {
+            if (!CategoryExists(categoryID, out CategoryDTO category))
+            {
+                return NotFound();
+            }
+
+            ProductDTO productFromStore = category.Products.FirstOrDefault(p => p.ID == productID);
+
+            if (productFromStore == null)
+            {
+                return NotFound();
+            }
+
+            category.Products.Remove(productFromStore);
+
+            return NoContent();
         }
     }
 
