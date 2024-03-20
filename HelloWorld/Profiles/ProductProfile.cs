@@ -11,6 +11,7 @@ namespace HelloWorld.Profiles
             CreateMap<Product, ProductDTO>()
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ID * 2));
         }
-
+         
     }
+
 }

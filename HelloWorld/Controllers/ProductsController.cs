@@ -14,21 +14,23 @@ namespace HelloWorld.Controllers
     {
         private ILogger<ProductsController> _logger;
         private IMailService _mailService;
-        private readonly IProductRepository _productRepository;
+        private readonly IProductRepository _repo;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
-        public ProductsController(ILogger<ProductsController> logger, IMailService mailService, IProductRepository productRepository, IMapper mapper) 
+        public ProductsController(ILogger<ProductsController> logger, IMailService mailService, IProductRepository productRepository, ICategoryRepository categoryRepository,IMapper mapper) 
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mailService = mailService;
-            _productRepository = productRepository;
+            _repo = productRepository;
             _mapper = mapper;
+            _categoryRepository = categoryRepository;
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllProductsAsync() 
         {
-            IEnumerable<Product> products = await _productRepository.GetProductsAsync();
+            IEnumerable<Product> products = await _repo.GetProductsAsync();
 
             //Use automapper to convert List<product> to List<ProductDTO>
             List<ProductDTO> result = _mapper.Map<List<ProductDTO>>(products);
@@ -38,16 +40,27 @@ namespace HelloWorld.Controllers
 
 
         [HttpGet]
-        public ActionResult<List<ProductDTO>> GetProducts(int categoryID)
+        public async Task<ActionResult<List<ProductDTO>>> GetProducts(int categoryID)
         {
-            
-            if (!CategoryExists(categoryID, out CategoryDTO category ))
+            if (!await _categoryRepository.CategoryExistsAsync(categoryID))
             {
-                _logger.LogWarning($"Someone was looking for category with id: {categoryID}");
-                return NotFound();
+                _logger.LogWarning("Category not found");
+                return NotFound("Category not found");
             }
+
+            IEnumerable<Product> products = await _repo.GetProductsForCategoryAsync(categoryID);
+
+            return Ok(_mapper.Map<List<ProductDTO>>(products));
+
+                       
             
-            return Ok(category.Products);
+            //if (!CategoryExists(categoryID, out CategoryDTO category ))
+            //{
+            //    _logger.LogWarning($"Someone was looking for category with id: {categoryID}");
+            //    return NotFound();
+            //}
+            
+            //return Ok(category.Products);
         }
 
 

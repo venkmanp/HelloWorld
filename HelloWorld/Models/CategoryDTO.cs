@@ -7,8 +7,8 @@
 
         public string Name { get; set; }
 
-        public int ProductCount {  get; set; }
+        public int ProductCount => Products.Count;
 
-        public List<ProductDTO> Products { get; set; } = new List<ProductDTO>();
+        public List<ProductDTO> Products { get; set; }
     }
 }

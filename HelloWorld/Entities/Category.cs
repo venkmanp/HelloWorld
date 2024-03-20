@@ -8,6 +8,8 @@ namespace HelloWorld.Entities
         [Required]
         [StringLength(100)]
         public string Name { get; set; } = name;
+
+        public List<Product> Products { get; set; } = new List<Product>();
     }
 
 }

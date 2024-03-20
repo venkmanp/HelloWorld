@@ -1,32 +1,65 @@
-﻿using HelloWorld.Models;
+﻿using AutoMapper;
+using HelloWorld.Entities;
+using HelloWorld.Models;
+using HelloWorld.Repositories;
+using HelloWorld.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HelloWorld.Controllers
 {
     [ApiController]
     [Route("api/categories")]
+    
     public class CategoriesController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<CategoryDTO>> GetCategories()
+        private ILogger<CategoriesController> _logger;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IMapper _mapper;
+
+        public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository categoryRepository, IMapper mapper)
         {
-            return Ok(new List<CategoryDTO>
-            {
-                new CategoryDTO { ID=1, Name="Books" },
-                new CategoryDTO { ID=2, Name="Shoes" }
-            });
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _categoryRepository = categoryRepository;
+            _mapper = mapper;
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult<List<CategoryDTO>>> GetCategories()
+        {
+            IEnumerable<Category> categories = await _categoryRepository.GetCategoriesAsync();
+
+            return Ok(_mapper.Map<List<CategoryDTO>>(categories));
+
         }
 
 
         [HttpGet("{id}")]
-        public ActionResult<CategoryDTO> GetCategory(int id)
+        public async Task<IActionResult> GetCategory(int id, bool includeProducts)
         {
-            CategoryDTO category = MyDataStore.Categories.FirstOrDefault(c => c.ID == id);
+            Category? category = await _categoryRepository.GetCategoryAsync(id, includeProducts);
+
             if (category == null)
             {
                 return NotFound();
             }
-            return Ok(category);
+
+            if (includeProducts)
+            {
+                return Ok(_mapper.Map<CategoryDTO>(category));
+               
+            }
+            return Ok(_mapper.Map<CategoryWithNoProductsDTO>(category));
+            //TODO: return a DTO with no products
+
+
+            //CategoryDTO category = MyDataStore.Categories.FirstOrDefault(c => c.ID == id);
+            //if (category == null)
+            //{
+            //    return NotFound();
+            //}
+            //return Ok(category);
         }
     }
 }
