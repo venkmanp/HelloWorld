@@ -1,4 +1,7 @@
-﻿using HelloWorld.Models;
+﻿using AutoMapper;
+using HelloWorld.Entities;
+using HelloWorld.Models;
+using HelloWorld.Repositories;
 using HelloWorld.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,14 +14,29 @@ namespace HelloWorld.Controllers
     {
         private ILogger<ProductsController> _logger;
         private IMailService _mailService;
+        private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
-        public ProductsController(ILogger<ProductsController> logger, IMailService mailService) 
+        public ProductsController(ILogger<ProductsController> logger, IMailService mailService, IProductRepository productRepository, IMapper mapper) 
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mailService = mailService;
+            _productRepository = productRepository;
+            _mapper = mapper;
         }
 
-        
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllProductsAsync() 
+        {
+            IEnumerable<Product> products = await _productRepository.GetProductsAsync();
+
+            //Use automapper to convert List<product> to List<ProductDTO>
+            List<ProductDTO> result = _mapper.Map<List<ProductDTO>>(products);
+
+            return Ok(result);
+        }
+
+
         [HttpGet]
         public ActionResult<List<ProductDTO>> GetProducts(int categoryID)
         {

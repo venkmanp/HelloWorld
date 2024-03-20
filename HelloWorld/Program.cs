@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using HelloWorld.Services;
 using HelloWorld.Contexts;
 using Microsoft.EntityFrameworkCore;
+using HelloWorld.Repositories;
 
 namespace HelloWorld
 {
@@ -46,6 +47,10 @@ namespace HelloWorld
             builder.Services.AddDbContext<MainContext>(
                 opt => opt.UseSqlite(builder.Configuration["ConnectionStrings:Main"])
                 );
+            
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
             builder.Host.UseSerilog();
 
