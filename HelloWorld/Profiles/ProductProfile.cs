@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HelloWorld.Entities;
 using HelloWorld.Models;
 
 namespace HelloWorld.Profiles
@@ -7,7 +8,8 @@ namespace HelloWorld.Profiles
     {
         public ProductProfile()
         {
-            CreateMap<ProductProfile, ProductDTO>();
+            CreateMap<Product, ProductDTO>()
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.ID * 2));
         }
 
     }
