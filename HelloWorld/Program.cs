@@ -1,5 +1,6 @@
 using Serilog;
 using Microsoft.AspNetCore.StaticFiles;
+using HelloWorld.Services;
 
 namespace HelloWorld
 {
@@ -34,6 +35,11 @@ namespace HelloWorld
             });
 
             builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
+#if DEBUG
+            builder.Services.AddTransient<IMailService, LocalMailService>();
+#else
+            builder.Services.AddTransient<IMailService, RealMailService>();
+#endif
 
             builder.Host.UseSerilog();
 
