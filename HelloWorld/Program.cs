@@ -1,6 +1,8 @@
 using Serilog;
 using Microsoft.AspNetCore.StaticFiles;
 using HelloWorld.Services;
+using HelloWorld.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace HelloWorld
 {
@@ -41,6 +43,10 @@ namespace HelloWorld
             builder.Services.AddTransient<IMailService, RealMailService>();
 #endif
 
+            builder.Services.AddDbContext<MainContext>(
+                opt => opt.UseSqlite(builder.Configuration["ConnetionStrings:Main"])
+                );
+            
             builder.Host.UseSerilog();
 
             var app = builder.Build();

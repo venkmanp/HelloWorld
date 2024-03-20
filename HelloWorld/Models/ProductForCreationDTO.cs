@@ -5,7 +5,7 @@ namespace HelloWorld.Models
     public class ProductForCreationDTO
     {
         [Required]
-        [StringLength(50)]
+        [StringLength(100)]
         public string Name { set; get; }
 
         [MaxLength(500)]
