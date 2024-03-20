@@ -44,7 +44,7 @@ namespace HelloWorld
 #endif
 
             builder.Services.AddDbContext<MainContext>(
-                opt => opt.UseSqlite(builder.Configuration["ConnetionStrings:Main"])
+                opt => opt.UseSqlite(builder.Configuration["ConnectionStrings:Main"])
                 );
             
             builder.Host.UseSerilog();
