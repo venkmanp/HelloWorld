@@ -65,8 +65,26 @@ namespace HelloWorld.Controllers
 
 
         [HttpGet("{productID}", Name = "GetProduct")]
-        public ActionResult<ProductDTO> GetProduct(int categoryID, int productID)
+        public async Task<ActionResult<ProductDTO>> GetProduct(int categoryID, int productID)
         {
+            if (!await _categoryRepository.CategoryExistsAsync(categoryID))
+            {
+                _logger.LogWarning("Category not found");
+                return NotFound("Category not found");
+            }
+
+            Product? product = await _repo.GetProductForCategoryAsync(categoryID, productID);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+            
+            return Ok(_mapper.Map<ProductDTO>(product));
+
+
+
+            /*
             if (!CategoryExists(categoryID, out CategoryDTO category))
             {
                 _logger.LogWarning($"Someone was looking for category with id: {categoryID}");
@@ -80,7 +98,10 @@ namespace HelloWorld.Controllers
                 return NotFound();
             }
             return Ok(product);
+            */
         }
+
+        
 
         private bool CategoryExists(int categoryID, out CategoryDTO category)
         {
@@ -90,8 +111,29 @@ namespace HelloWorld.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateProduct(int categoryID, ProductForCreationDTO product)
+        public async Task<ActionResult> CreateProduct(int categoryID, ProductForCreationDTO product)
         {
+
+            if (!await _categoryRepository.CategoryExistsAsync(categoryID))
+            {
+                _logger.LogWarning("Category not found");
+                return NotFound("Category not found");
+            }
+
+            Product productToCreate = _mapper.Map<Product>(product);
+            productToCreate.CategoryID = categoryID;
+
+            await _repo.AddProductAsync(productToCreate);
+
+            return CreatedAtRoute("GetProduct", new
+            {
+                categoryID,
+                productID = productToCreate.ID
+            }, productToCreate);
+            
+            
+
+            /*
             if (!CategoryExists(categoryID, out CategoryDTO category))
             {
                 return NotFound();
@@ -113,11 +155,33 @@ namespace HelloWorld.Controllers
                 categoryID,
                 productID = newProduct.ID
             }, newProduct);
+
+        */
         }
 
         [HttpPut("{productID}")]
-        public ActionResult UpdateProduct(int categoryID, int productID, ProductForUpdateDTO product)
+        public async Task<ActionResult> UpdateProduct(int categoryID, int productID, ProductForUpdateDTO product)
         {
+            if (!await _categoryRepository.CategoryExistsAsync(categoryID))
+            {
+                _logger.LogWarning("Category not found");
+                return NotFound("Category not found");
+            }
+
+            Product? productToUpdate = await _repo.GetProductForCategoryAsync(categoryID, productID);
+
+            if (productToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            _mapper.Map(product, productToUpdate); //This uses automapper without a profile to copy all properties
+
+            await _repo.SaveAsync();
+
+            return NoContent();
+
+            /*
             if (!CategoryExists(categoryID, out CategoryDTO category))
             {
                 return NotFound();
@@ -134,7 +198,7 @@ namespace HelloWorld.Controllers
             productFromStore.Price = product.Price;
 
             return NoContent();
-
+            */
         }
 
         [HttpDelete("{productID}")]

@@ -14,9 +14,13 @@ namespace HelloWorld.Repositories
             _context = context;
         }
 
-        public Task AddProductAsync(Product product)
+        public async Task AddProductAsync(Product product, bool autosave = true)
         {
-            throw new NotImplementedException();
+            await _context.Products.AddAsync(product);
+            if (autosave)
+            {
+                await _context.SaveChangesAsync(); //Save here to DB? maybe we should save after we add a lot of products...
+            }
         }
 
         public Task DeleteProductAsync(Product product)
@@ -32,6 +36,13 @@ namespace HelloWorld.Repositories
         public async Task<IEnumerable<Product>> GetProductsForCategoryAsync(int categoryID)
         {
             return await _context.Products.Where(p => p.CategoryID == categoryID).ToListAsync();
+        }
+
+        public async Task<Product?> GetProductForCategoryAsync(int categoryID, int productID)
+        {
+            return await _context.Products
+                .Where(p => p.CategoryID == categoryID && p.ID == productID)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> SaveAsync()
