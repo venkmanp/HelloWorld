@@ -1,4 +1,5 @@
 ﻿using HelloWorld.Entities;
+using HelloWorld.Models;
 
 namespace HelloWorld.Repositories
 {
@@ -6,7 +7,7 @@ namespace HelloWorld.Repositories
     {
         Task<IEnumerable<Category>> GetCategoriesAsync();
 
-        Task<IEnumerable<Category>> GetCategoriesAsync(string? name, string? searchQuery);
+        Task<(IEnumerable<Category>, PagingMetaData)> GetCategoriesAsync(string? name, string? searchQuery, int pageNumber, int pageSize);
 
         Task<Category?> GetCategoryAsync(int id, bool includeProducts);
 

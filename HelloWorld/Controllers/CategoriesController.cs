@@ -15,6 +15,7 @@ namespace HelloWorld.Controllers
         private ILogger<CategoriesController> _logger;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
+        const int maxPageSize = 10;
 
         public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository categoryRepository, IMapper mapper)
         {
@@ -24,19 +25,35 @@ namespace HelloWorld.Controllers
         }
 
 
-
+        //This example uses paging to return only the 10 results... or number specified of results per page
         [HttpGet]
-        public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name, string? searchQuery)
+        public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name, string? searchQuery, int pageNumber=1, int pageSize = 10)
         {
+            //Don't allow more than 10 results per page:
+            if (pageSize > maxPageSize)
+            {
+                pageSize = maxPageSize;
+            }
+            
+            /*
             IEnumerable<Category> categories;
+            
             if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(searchQuery))
             {
                 categories = await _categoryRepository.GetCategoriesAsync();
                 
             } else
             {
-                categories = await _categoryRepository.GetCategoriesAsync(name, searchQuery);
+                categories = await _categoryRepository.GetCategoriesAsync(name, searchQuery, pageNumber, pageSize);
             }
+            */
+
+            var (categories, meta) = await _categoryRepository.GetCategoriesAsync(name, searchQuery, pageNumber, pageSize);
+
+            //We should return the paging metadata in the headers of the response, and not in the body:
+            Response.Headers.Append("X-PageNumber", meta.PageNumber.ToString());
+            Response.Headers.Append("X-PageSize", meta.PageSize.ToString());
+            Response.Headers.Append("X-TotalItemCount", meta.TotalItemCount.ToString());
 
             return Ok(_mapper.Map<List<CategoryDTO>>(categories));
 

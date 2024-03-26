@@ -1,5 +1,6 @@
 ﻿using HelloWorld.Contexts;
 using HelloWorld.Entities;
+using HelloWorld.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HelloWorld.Repositories
@@ -23,7 +24,7 @@ namespace HelloWorld.Repositories
             return await _context.Categories.ToListAsync();
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync(string? name, string? searchQuery)
+        public async Task<(IEnumerable<Category>, PagingMetaData)> GetCategoriesAsync(string? name, string? searchQuery, int pageNumber, int pageSize)
         {
             IQueryable<Category> categories = _context.Categories as IQueryable<Category>; //Note that we are using an IQueryable and not a IEnumerable.
 
@@ -40,7 +41,19 @@ namespace HelloWorld.Repositories
                 categories = categories.Where(c=>c.Name.Contains(searchQuery));
             }
 
-            return await categories.ToListAsync();
+            int totalCount = await categories.CountAsync(); //To return meta-data of how many total results there are.
+
+            PagingMetaData meta = new PagingMetaData
+            {
+                TotalItemCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            //Limit the query to return only the page requested; This fetches the correct set of results for the specified page from the DB:
+            categories = categories.OrderBy(c => c.ID).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+            
+            return (await categories.ToListAsync(), meta);
         }
 
         public async Task<Category?> GetCategoryAsync(int id, bool includeProducts)
