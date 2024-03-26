@@ -26,7 +26,7 @@ namespace HelloWorld.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<CategoryDTO>>> GetCategories()
+        public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name)
         {
             IEnumerable<Category> categories = await _categoryRepository.GetCategoriesAsync();
 

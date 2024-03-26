@@ -23,6 +23,12 @@ namespace HelloWorld.Repositories
             return await _context.Categories.ToListAsync();
         }
 
+        public Task<IEnumerable<Category>> GetCategoriesAsync(string? name)
+        {
+            IQueryable<Category> categories = _context.Categories as IQueryable<Category>; //Note that we are using an IQueryable and not a IEnumerable.
+
+        }
+
         public async Task<Category?> GetCategoryAsync(int id, bool includeProducts)
         {
             if (includeProducts)
