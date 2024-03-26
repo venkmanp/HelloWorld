@@ -23,10 +23,17 @@ namespace HelloWorld.Repositories
             return await _context.Categories.ToListAsync();
         }
 
-        public Task<IEnumerable<Category>> GetCategoriesAsync(string? name)
+        public async Task<IEnumerable<Category>> GetCategoriesAsync(string? name)
         {
             IQueryable<Category> categories = _context.Categories as IQueryable<Category>; //Note that we are using an IQueryable and not a IEnumerable.
 
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                name = name.Trim();
+                categories = categories.Where(c => c.Name == name);
+            }
+            
+            return await categories.ToListAsync();
         }
 
         public async Task<Category?> GetCategoryAsync(int id, bool includeProducts)
