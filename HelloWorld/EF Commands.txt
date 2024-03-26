@@ -1,3 +1,5 @@
 dotnet tool install -g dotnet-ef
 
-dotnet ef Migrations 
+dotnet ef Migrations add [NAME]
+
+dotnet ef database update
