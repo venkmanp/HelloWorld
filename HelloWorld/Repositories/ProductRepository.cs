@@ -23,9 +23,13 @@ namespace HelloWorld.Repositories
             }
         }
 
-        public Task DeleteProductAsync(Product product)
+        public async Task DeleteProductAsync(Product product, bool autosave = true)
         {
-            throw new NotImplementedException();
+            _context.Products.Remove(product);
+            if (autosave)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<IEnumerable<Product>> GetProductsAsync()

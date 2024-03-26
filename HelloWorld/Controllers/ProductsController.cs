@@ -202,8 +202,26 @@ namespace HelloWorld.Controllers
         }
 
         [HttpDelete("{productID}")]
-        public ActionResult DeleteProduct (int categoryID, int productID)
+        public async Task<ActionResult> DeleteProductAsync (int categoryID, int productID)
         {
+            if (!await _categoryRepository.CategoryExistsAsync(categoryID))
+            {
+                _logger.LogWarning("Category not found");
+                return NotFound("Category not found");
+            }
+
+            Product? productToDelete = await _repo.GetProductForCategoryAsync(categoryID, productID);
+
+            if (productToDelete == null)
+            {
+                return NotFound();
+            }
+
+            await _repo.DeleteProductAsync(productToDelete);
+
+            return NoContent();
+
+            /*
             if (!CategoryExists(categoryID, out CategoryDTO category))
             {
                 return NotFound();
@@ -221,6 +239,7 @@ namespace HelloWorld.Controllers
             _mailService.Send("Product deleted", $"a user deleted the products {productFromStore.Name}");
 
             return NoContent();
+            */
         }
     }
 
