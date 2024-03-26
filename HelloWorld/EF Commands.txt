@@ -1,5 +1,6 @@
 dotnet tool install -g dotnet-ef
 
+(now build the project and then)
 dotnet ef Migrations add [NAME]
 
 dotnet ef database update

@@ -5,7 +5,7 @@
 namespace HelloWorld.Migrations
 {
     /// <inheritdoc />
-    public partial class Users : Migration
+    public partial class users : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
