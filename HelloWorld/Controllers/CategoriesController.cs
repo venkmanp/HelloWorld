@@ -26,16 +26,16 @@ namespace HelloWorld.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name)
+        public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name, string? searchQuery)
         {
             IEnumerable<Category> categories;
-            if (name == null)
+            if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(searchQuery))
             {
                 categories = await _categoryRepository.GetCategoriesAsync();
                 
             } else
             {
-                categories = await _categoryRepository.GetCategoriesAsync(name);
+                categories = await _categoryRepository.GetCategoriesAsync(name, searchQuery);
             }
 
             return Ok(_mapper.Map<List<CategoryDTO>>(categories));

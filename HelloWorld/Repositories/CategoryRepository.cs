@@ -23,7 +23,7 @@ namespace HelloWorld.Repositories
             return await _context.Categories.ToListAsync();
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync(string? name)
+        public async Task<IEnumerable<Category>> GetCategoriesAsync(string? name, string? searchQuery)
         {
             IQueryable<Category> categories = _context.Categories as IQueryable<Category>; //Note that we are using an IQueryable and not a IEnumerable.
 
@@ -33,6 +33,13 @@ namespace HelloWorld.Repositories
                 categories = categories.Where(c => c.Name == name);
             }
             
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                //categories = categories.Where(c => c.Name.Contains(searchQuery, StringComparison.InvariantCultureIgnoreCase)); not supported in SQLite
+                categories = categories.Where(c=>c.Name.Contains(searchQuery));
+            }
+
             return await categories.ToListAsync();
         }
 

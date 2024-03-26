@@ -6,7 +6,7 @@ namespace HelloWorld.Repositories
     {
         Task<IEnumerable<Category>> GetCategoriesAsync();
 
-        Task<IEnumerable<Category>> GetCategoriesAsync(string? name);
+        Task<IEnumerable<Category>> GetCategoriesAsync(string? name, string? searchQuery);
 
         Task<Category?> GetCategoryAsync(int id, bool includeProducts);
 
