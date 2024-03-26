@@ -11,6 +11,8 @@ namespace HelloWorld.Contexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    optionsBuilder.UseSqlite("Connectionstring");
@@ -20,6 +22,17 @@ namespace HelloWorld.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    ID = 1,
+                    Username = "Simon",
+                    Password = "1234",
+                    AutherizationLevel = 10
+                }
+                );
+            
+            
             modelBuilder.Entity<Category>().HasData(
                 new Category("Category 1")
                 {
