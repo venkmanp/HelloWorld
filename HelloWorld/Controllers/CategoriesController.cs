@@ -3,13 +3,14 @@ using HelloWorld.Entities;
 using HelloWorld.Models;
 using HelloWorld.Repositories;
 using HelloWorld.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HelloWorld.Controllers
 {
     [ApiController]
     [Route("api/categories")]
-    
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private ILogger<CategoriesController> _logger;
@@ -27,6 +28,7 @@ namespace HelloWorld.Controllers
 
         //This example uses paging to return only the 10 results... or number specified of results per page
         [HttpGet]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name, string? searchQuery, int pageNumber=1, int pageSize = 10)
         {
             //Don't allow more than 10 results per page:
@@ -63,6 +65,12 @@ namespace HelloWorld.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategory(int id, bool includeProducts)
         {
+            //example on for limiting a user only to category ID that is in the user's JWT claims:
+            if (User.Claims.FirstOrDefault(c=>c.Type == "allowed_category")?.Value != id.ToString())
+            {
+                return Forbid();
+            }
+
             Category? category = await _categoryRepository.GetCategoryAsync(id, includeProducts);
 
             if (category == null)

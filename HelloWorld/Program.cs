@@ -4,6 +4,8 @@ using HelloWorld.Services;
 using HelloWorld.Contexts;
 using Microsoft.EntityFrameworkCore;
 using HelloWorld.Repositories;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace HelloWorld
 {
@@ -53,6 +55,31 @@ namespace HelloWorld
             builder.Services.AddScoped<IUserRepository, UserRespository>();
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer(o =>
+                {
+                    o.TokenValidationParameters = new()
+                    {
+                        //Here we specify what we want to validate in the token: the issuer, the algorithm, the audienceetc.
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+
+                        //Here we specify what to validate against: what the issuer should match, etc.
+                        ValidIssuer = builder.Configuration["Authentication:Issuer"],
+                        ValidAudience = builder.Configuration["Authentication:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Authentication:SecretKey"]))
+                    };
+                });
+
+            builder.Services.AddAuthorization(o =>
+            {
+                o.AddPolicy("IsAdmin", p=> {
+                    p.RequireAuthenticatedUser();
+                    p.RequireClaim("auth", "10");
+                });
+            });
             
             builder.Host.UseSerilog();
 
@@ -66,6 +93,8 @@ namespace HelloWorld
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

@@ -3,6 +3,7 @@ using HelloWorld.Entities;
 using HelloWorld.Models;
 using HelloWorld.Repositories;
 using HelloWorld.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,7 @@ namespace HelloWorld.Controllers
 {
     [Route("api/categories/{categoryID}/products")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private ILogger<ProductsController> _logger;

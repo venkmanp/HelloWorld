@@ -54,6 +54,7 @@ public class LoginController : ControllerBase
                 new Claim ("auth", user.AutherizationLevel.ToString()),
                 new Claim ("user_name", user.Username.ToString()),
                 //new Claim ("password", user.Password.ToString()) - Do not put the password in the claims because it will be visible!
+                new Claim ("allowed_category", "1")
             },
             DateTime.UtcNow,
             DateTime.UtcNow.AddHours(1),
