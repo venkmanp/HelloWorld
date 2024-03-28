@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -15,6 +16,7 @@ namespace HelloWorld.Controllers
         }
 
         [HttpGet("{fileID}")]
+        [ApiVersion(0.1, Deprecated = true)] //example for specifying that this endpoint is deprecated in future aPI versions.
         public ActionResult GetFile(int fileID)
         {
             string path = string.Empty;
