@@ -109,10 +109,11 @@ namespace HelloWorld
 
                 foreach (var desc in apiProvider.ApiVersionDescriptions) //build a swagger doc for each api version
                 {
-                    o.SwaggerDoc("MyAPI", new()
+                    o.SwaggerDoc($"{desc.GroupName}", new()
                     {
                         Title = "Ths is my cool API",
-                        Version = desc.ApiVersion.ToString()
+                        Version = desc.ApiVersion.ToString(),
+                        Description = "This api is for getting categories and products"
                     });
                 }
 
@@ -126,7 +127,14 @@ namespace HelloWorld
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(o =>
+                {
+                    var descriptions = app.DescribeApiVersions();
+                    foreach (var desc in descriptions)
+                    {
+                        o.SwaggerEndpoint($"/swagger/{desc.GroupName}/swagger.json", desc.GroupName.ToUpper());
+                    }
+                });
             }
 
             app.UseHttpsRedirection();

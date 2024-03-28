@@ -14,6 +14,17 @@
             <param name="pageSize">the size of the page to return (default 10)</param>
             <returns>the resulting list of categories by page</returns>
         </member>
+        <member name="M:HelloWorld.Controllers.CategoriesController.GetCategory(System.Int32,System.Boolean)">
+            <summary>
+            Get a single category by ID
+            </summary>
+            <param name="id">the id of the category to return</param>
+            <param name="includeProducts">a flag that indicates if we want the products returned in category object</param>
+            <returns>A category</returns>
+            <response code="200">A valid category with the given ID</response>
+            <response code="403">User is forbidden, does not have allowed_category claim</response>
+            <response code="404">No category with given ID was found</response>
+        </member>
         <member name="T:HelloWorld.Migrations.initDB">
             <inheritdoc />
         </member>
