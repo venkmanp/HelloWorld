@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace HelloWorld.Controllers;
 
@@ -37,20 +38,29 @@ public class LoginController : ControllerBase
             return Unauthorized();
         }
 
-        var key = new SymmetricSecurityKey(Convert.FromBase64String(_config["Authentication:SecretKey"]));
+        //Generate a key
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Authentication:SecretKey"]));
 
+        //Generate credentials:
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         //build the token:
         var token = new JwtSecurityToken(
             _config["Authentication:Issuer"],
             _config["Authentication:Audience"],
-            new List<Claim>(),
+            new List<Claim>()
+            {
+                new Claim ("sub", user.ID.ToString()), //"subject", this is by convention used to identify the claims prinicple (the user)
+                new Claim ("auth", user.AutherizationLevel.ToString()),
+                new Claim ("user_name", user.Username.ToString()),
+                //new Claim ("password", user.Password.ToString()) - Do not put the password in the claims because it will be visible!
+            },
             DateTime.UtcNow,
             DateTime.UtcNow.AddHours(1),
             creds
             );
         
+        //This generates the JWT and signs it by hashing the token with the creds.
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
         
         return Ok(tokenString);
