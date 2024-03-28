@@ -1,0 +1,28 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+#Add parameters:
+@schema=https
+@host=localhost
+@port=7170
+@version=2
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiYXV0aCI6IjEwIiwidXNlcl9uYW1lIjoiU2ltb24iLCJhbGxvd2VkX2NhdGVnb3J5IjoiMSIsIm5iZiI6MTcxMTYyODQ4OSwiZXhwIjoxNzExNjMyMDg5LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MTcwIiwiYXVkIjoiTXlBUEkifQ.kI8RDiin4N88XipSg2Opr4bIyfT6R8taG5Wghk-5Udw
+
+# This is like:
+# GET https://localhost:7170/api/v2/categories
+GET {{schema}}://{{host}}:{{port}}/api/v{{version}}/Categories
+Authorization: Bearer {{token}}
+# 
+
+###
+
+POST {{schema}}://{{host}}:{{port}}/api/v{{version}}/Categories
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+
+{
+  "name": "new product",
+  "description": "a new product",
+  "price": 100
+}

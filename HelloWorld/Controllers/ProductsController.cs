@@ -13,7 +13,7 @@ namespace HelloWorld.Controllers
     [Route("api/v{version:ApiVersion}categories/{categoryID}/products")]
     [ApiController]
     [ApiVersion(2)]
-    //[Authorize]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private ILogger<ProductsController> _logger;

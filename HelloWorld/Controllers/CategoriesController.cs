@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace HelloWorld.Controllers
 {
     [ApiController]
-    [Route("api/categories")]
+    [Route("api/v{version:ApiVersion}/categories")]
     [ApiVersion(1)]
     [ApiVersion(2)]
-    //[Authorize]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private ILogger<CategoriesController> _logger;
@@ -41,7 +41,7 @@ namespace HelloWorld.Controllers
         /// <returns>the resulting list of categories by page</returns>
         //This example uses paging to return only the 10 results... or number specified of results per page
         [HttpGet]
-        //[Authorize(Policy = "IsAdmin")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<List<CategoryDTO>>> GetCategories(string? name, string? searchQuery, int pageNumber=1, int pageSize = 10)
         {
             //Don't allow more than 10 results per page:

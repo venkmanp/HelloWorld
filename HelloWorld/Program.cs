@@ -9,6 +9,7 @@ using System.Text;
 using Asp.Versioning;
 using System.Reflection;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.OpenApi.Models;
 
 namespace HelloWorld
 {
@@ -102,11 +103,6 @@ namespace HelloWorld
 
             builder.Services.AddSwaggerGen(o =>
             {
-                var file = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var path = Path.Combine(AppContext.BaseDirectory, file);
-
-                o.IncludeXmlComments(path);
-
                 foreach (var desc in apiProvider.ApiVersionDescriptions) //build a swagger doc for each api version
                 {
                     o.SwaggerDoc($"{desc.GroupName}", new()
@@ -117,6 +113,34 @@ namespace HelloWorld
                     });
                 }
 
+                var file = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var path = Path.Combine(AppContext.BaseDirectory, file);
+
+                o.IncludeXmlComments(path);
+
+                //Add this to enable using JWT token authentication in swagger. It adds the "Authorize" button to swagger.
+                o.AddSecurityDefinition("MyAPIAuth", new()
+                {
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    Description = "Enter a valid token to access the API"
+                });
+
+                //Add this to enable using JWT token authentication in swagger. It tells swagger to add the token to each request. It will add the autorhization header when we make requests.
+                o.AddSecurityRequirement(new()
+                {
+                    {
+                        new () {
+                            Reference = new OpenApiReference
+                            {
+                                Type =ReferenceType.SecurityScheme,
+                                Id = "MyAPIAuth"
+                            }
+                        },
+                        new List<string> ()
+                    }
+
+                });
             });
 
             builder.Host.UseSerilog();
